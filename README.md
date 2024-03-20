@@ -4,4 +4,4 @@
 
 1 Add Header Component directly to the index.html file
 
-2
+### Working on Log Component
