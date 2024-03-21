@@ -3,19 +3,102 @@ import GameBoard from "./components/GameBoard";
 import Player from "./components/Player";
 import Log from "./Log";
 
+const WINNING_COMBINATIONS = [
+  [
+    { row: 0, col: 0 },
+    { row: 0, col: 1 },
+    { row: 0, col: 2 },
+  ],
+  [
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+    { row: 1, col: 2 },
+  ],
+  [
+    { row: 2, col: 0 },
+    { row: 2, col: 1 },
+    { row: 2, col: 2 },
+  ],
+  [
+    { row: 0, col: 0 },
+    { row: 1, col: 0 },
+    { row: 2, col: 0 },
+  ],
+  [
+    { row: 0, col: 1 },
+    { row: 1, col: 1 },
+    { row: 2, col: 1 },
+  ],
+  [
+    { row: 0, col: 2 },
+    { row: 1, col: 2 },
+    { row: 2, col: 2 },
+  ],
+  [
+    { row: 0, col: 0 },
+    { row: 1, col: 1 },
+    { row: 2, col: 2 },
+  ],
+  [
+    { row: 0, col: 2 },
+    { row: 1, col: 1 },
+    { row: 2, col: 0 },
+  ],
+];
+
+const getActivePlayer = (gameTurns) => {
+  let currentPlayer = "X";
+  if (gameTurns.length > 0 && gameTurns[0].player === "X") {
+    currentPlayer = "O";
+  }
+
+  return currentPlayer;
+};
+
+const initialGameBoard = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
+
 function App() {
-  const [activePlayer, setActivePlayer] = useState("X");
+  // const [activePlayer, setActivePlayer] = useState("X");
   const [gameTurns, setGameTurns] = useState([]);
+  // const [hasWinner, setHasWinner] = useState(false)
+
+  const activePlayer = getActivePlayer(gameTurns);
+
+  const gameBoard = initialGameBoard;
+  for (const turn of turns) {
+    const { square, player } = turn;
+    const { row, col } = square;
+
+    gameBoard[row][col] = player;
+  }
+  let winner;
+
+  for (const combination of WINNING_COMBINATIONS) {
+    const firstSquareSymbol =
+      gameBoard[combination[0].row][combination[0].column];
+    const secondSquareSymbol =
+      gameBoard[combination[1].row][combination[1].column];
+    const thirdSquareSymbol =
+      gameBoard[combination[2].row][combination[2].column];
+
+    if (
+      firstSquareSymbol &&
+      firstSquareSymbol === secondSquareSymbol &&
+      firstSquareSymbol === thirdSquareSymbol
+    ) {
+      winner = firstSquareSymbol;
+    }
+  }
 
   const handleSelectSquare = (rowIndex, colIndex) => {
-    setActivePlayer((prev) => (prev === "X" ? "O" : "X"));
+    // setActivePlayer((prev) => (prev === "X" ? "O" : "X"));
 
     setGameTurns((prevTurns) => {
-      let currentPlayer = "X";
-
-      if (prevTurns.length > 0 && prevTurns[0].player === "X") {
-        currentPlayer = "O";
-      }
+      let currentPlayer = getActivePlayer(prevTurns);
 
       const updatedTurns = [
         {
@@ -44,10 +127,11 @@ function App() {
             isActive={activePlayer === "O"}
           />
         </ol>
+        {winner && <p>You Won, {winner}</p>}
         <GameBoard
           onSelect={handleSelectSquare}
           activePlayerSymbol={activePlayer}
-          turns={gameTurns}
+          board={gameBoard}
         />
       </div>
       <Log turns={gameTurns} />
